@@ -5,7 +5,7 @@ clc
 clear
 getDriveFolder;
 cloudFolder = [driveFolder,'\Laugh\HD-DOT\photogrammetry'];
-cloudName = 'Kunkun_session01';
+cloudName = 'Odin_session01';
 
 
 propsFile = [cloudFolder,'/',cloudName,'_distances.mat'];
