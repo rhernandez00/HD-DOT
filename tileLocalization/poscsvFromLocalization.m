@@ -2,17 +2,16 @@ clear
 getDriveFolder;
 addpath([driveFolder,'\HD-DOT\HD-DOT\functions']);
 
-participant = 'Odin';
+participant = 'Kunkun';
 specie = 'D';
 session = 1;
-locationsFolder = ['G:\My Drive\Laugh\HD-DOT\photogrammetry'];
+locationsFolder = ['G:\My Drive\Laugh\HD-DOT\workingFolder\photogrammetry'];
 
 dataFolder = 'G:\My Drive';
 csvName = [locationsFolder,'\',participant,'_session',sprintf('%02d',session),'_pos.csv'];
 locationsFile = [locationsFolder,'\',participant,'_session',sprintf('%02d',session),'_realDistance_aligned.mat'];
 meshType = [specie,participant];
-meshFileName = getMesh(meshType);
-mesh = load(meshFileName,'-mat'); %loads the atlas mesh 
+[~,mesh] = getMesh(meshType,true);
 
 
 appProps = load(locationsFile);

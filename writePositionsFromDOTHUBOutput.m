@@ -9,7 +9,7 @@
 clear
 getDriveFolder
 addpath([pwd,'\functions']);
-participant = 'Kunkun';
+participant = 'Odin';
 runN = 1;
 
 experiment = 'Laugh';
@@ -20,14 +20,14 @@ SD3DOut = [workingFolder,'\',participant,'_run',sprintf('%02d',runN),'_Landmarks
 meshDOut = [workingFolder,'\',participant,'_run',sprintf('%02d',runN),'_LandmarksMesh.csv']; %mesh coords saved as csv
 posOut = [workingFolder,'\',participant,'_run',sprintf('%02d',runN),'_SD3Dpos.csv']; %mesh coords saved as csv
 
-% SD3DPath = [dataPath,'\',experiment,'\preprocessed\',participant,...
-%     '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
-% SD3DPathBackup = [dataPath,'\',experiment,'\preprocessed\',participant,...
-%     '_run',sprintf('%02d',runN),'_orig.SD3D']; %original layout file
-SD3DPath = [workingFolder,'\',participant,...
+SD3DPath = [dataPath,'\',experiment,'\preprocessed\',participant,...
     '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
-SD3DPathBackup = [workingFolder,'\',participant,...
+SD3DPathBackup = [dataPath,'\',experiment,'\preprocessed\',participant,...
     '_run',sprintf('%02d',runN),'_orig.SD3D']; %original layout file
+% SD3DPath = [workingFolder,'\',participant,...
+%     '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
+% SD3DPathBackup = [workingFolder,'\',participant,...
+%     '_run',sprintf('%02d',runN),'_orig.SD3D']; %original layout file
 
 
 colorList = [1,0,0;0,1,0;0,0,1;1,1,0;0,1,1].*255; %Colors added to identify the dots in the csv files
@@ -40,7 +40,7 @@ else
     disp(['Original file found, creating backup file']);
 end
 SD3D = load(SD3DPathBackup,'-mat'); %loads the SD3D file
-
+SD3D = SD3D.SD3D;
 SD3DOriginalLandmarks = [SD3D.Landmarks,colorList];
 csvwrite(SD3DOut,SD3DOriginalLandmarks); %Writes csv with original SD3D landmarks to be moved
 disp([SD3DOut ' done']);
@@ -50,6 +50,6 @@ meshLandmarks = [mesh.landmarks,colorList];
 csvwrite(meshDOut,meshLandmarks); %writes reference csv
 disp([meshDOut ' done']);
 
-T = getSourcesAndDetectorsPos(SD3DPath);
+T = getSourcesAndDetectorsPos(SD3DPathBackup); %loads the sources/detector positions
 writetable(T,posOut);
 disp(['File ', posOut, ' done']);

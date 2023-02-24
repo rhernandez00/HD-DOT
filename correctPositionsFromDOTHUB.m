@@ -3,128 +3,57 @@
 % in the .nirs and .SD3D files
 %Author: Raul
 %19/Feb/2023
-%% Step 1. Output in csv the landmark coordinates from the mesh and the ones
-% in the SD3D file.
-% Step 2. Correct the landmarks in the SD3D file
+
 clear
 getDriveFolder
-participant = 'Kunkun';
+participant = 'Odin';
 runN = 1;
 
 experiment = 'Laugh';
 dataPath = 'D:\Raul\data';
-workingFolder = [driveFolder,'\',experiment,'\HD-DOT\workingFolder'];
-
-SD3DOut = [workingFolder,'\',participant,'_run',sprintf('%02d',runN),'_SD3D.csv']; %SD3D coords saved as csv
-meshDOut = [workingFolder,'\',participant,'_run',sprintf('%02d',runN),'_LandmarksMesh.csv']; %mesh coords saved as csv
-
-
+% workingFolder = [driveFolder,'\',experiment,'\HD-DOT\workingFolder'];
+workingFolder = [dataPath,'\',experiment,'\preprocessed'];
 % SD3DPath = [dataPath,'\',experiment,'\preprocessed\',participant,...
 %     '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
 % SD3DPathBackup = [dataPath,'\',experiment,'\preprocessed\',participant,...
 %     '_run',sprintf('%02d',runN),'_orig.SD3D']; %original layout file
-SD3DPath = [workingFolder,'\',participant,...
-    '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
-SD3DPathBackup = [workingFolder,'\',participant,...
-    '_run',sprintf('%02d',runN),'_orig.SD3D']; %original layout file
+% nirsFilePath = [dataPath,'\',experiment,'\preprocessed\',participant,...
+%     '_run',sprintf('%02d',runN),'.nirs']; %original nirs file
 
-SD3D = load(SD3DPath,'-mat');
-movefile(SD3DPath,SD3DPathBackup);
+basePath = [workingFolder,'\',participant,...
+    '_run',sprintf('%02d',runN)];
+
+SD3D = load([basePath,'_orig.SD3D'],'-mat'); %loads the original SD3D file
 SD3D = SD3D.SD3D;
 
-colorList = [1,0,0;0,1,0;0,0,1;1,1,0;0,1,1].*255; %Colors added to identify the dots
-SD3DOriginalLandmarks = [SD3D.Landmarks,colorList];
+nirs = load([basePath,'.nirs'],'-mat'); %loads the .nirs file
 
 [~,mesh] = getMesh(['D',participant],true); %loads the mesh to get the landmarks
 SD3D.Landmarks = mesh.landmarks; %changes the landmarks in the SD3D file
-save(SD3DPath,'-struct','SD3D'); %overwrites the file
-disp([SD3DPath, ' saved with corrected landmarks']);
 
-%Creates two csv files one to be moved (SD3D) and one for reference (mesh)
-csvwrite(SD3DOut,SD3DOriginalLandmarks); %Writes csv with original SD3D landmarks to be moved
-disp([SD3DOut ' done']);
+alignedPos = readtable([basePath,'_SD3Dpos_aligned.txt']); %reads the aligned source/detector positions
+tableCols = alignedPos.Properties.VariableNames;
 
-meshLandmarks = [mesh.landmarks,colorList];
-csvwrite(meshDOut,meshLandmarks); %writes reference csv
-disp([meshDOut ' done']);
+%loads the original sources and detectors table
+positionsTable = getSourcesAndDetectorsPos([basePath,'_orig.SD3D']); 
+alignedPos.ID = positionsTable.ID; %uses the first column to know which row corresponds to which det/src
 
-
-%% Step 3. Load the coordinates from the sources and detectors in the .nirs and the SD3D file
-
-
-% SD3DPath = [dataPath,'\',experiment,'\preprocessed\',participant,...
-%     '_run',sprintf('%02d',runN),'_default.SD3D']; %original layout file
-T = getSourcesAndDetectorsPos(SD3DPath);
-
-%%
-
-clear
-getDriveFolder;
-participant = 'Odin';
-nContrast = 2;
-contrastsPossible = {'Sound','Laugh'};
-
-contrastName = contrastsPossible{nContrast};
-
-%Loading a prepro to replicate its structure
-filesPath = 'G:\My Drive\Laugh\HD-DOT\tmp';
-filesPath = 'D:\Raul\data\Laugh\preprocessed';
-%preproFileName = [filesPath,'\',participant,'_run01.prepro'];
-preproFileName = [filesPath,'\',participant,'_run01.prepro'];
-preproFolder = [driveFolder,'\Laugh\HD-DOT\nirsFiles'];
-preproOut = [filesPath,'\',participant,'_',contrastName,'.prepro'];
-prepro = load(preproFileName,'-mat');
-
-%Initializes resTable. Which will contain tstats for each
-%source*dectector*lambda possible
-variableNames = {'source','detector','lambda','tstat'};
-variableTypes = {'uint16','uint16','uint16','double'};
-resTable = table('Size',[size(prepro.SD3D.MeasList,1),numel(variableNames)],'VariableNames',...
-    variableNames,'VariableTypes',variableTypes);
-resTable.source(:) = prepro.SD3D.MeasList(:,1);
-resTable.detector(:) = prepro.SD3D.MeasList(:,2);
-resTable.lambda(:) = prepro.SD3D.Lambda(prepro.SD3D.MeasList(:,4));
-
-%Loads data from the fixEffect GLM and saves it in resTable
-dataPath = [driveFolder,'\Laugh\HD-DOT\nirsFiles'];
-switch contrastName
-    case 'Sound'
-        if strcmp(participant,'Rohan')
-            fixEffectRes = load([dataPath,'\tstatsRohan.mat'],'tstats','link');
-        else
-            fixEffectRes = load([dataPath,'\tstats.mat'],'tstats','link');
-        end
-    case 'Laugh'
-        if strcmp(participant,'Rohan')
-            fixEffectRes = load([dataPath,'\tstats_Laugh-ShuffledRohan.mat'],'tstats','link');
-        else
-            fixEffectRes = load([dataPath,'\tstats_Laugh-Shuffled.mat'],'tstats','link');
-        end
+for nRow = 1:size(alignedPos,1) %This loop assigns each det/src position from the csv to SD3D .DetPos and .SrcPos
+    ID = alignedPos.ID{nRow};
+    posType = ID(1:3);    
+    for ax = 1:3
+        colName = tableCols{ax};
+        SD3D.([ID(1:3),'Pos'])(str2double(ID(4:5)),ax) = alignedPos.(colName)(nRow);
+    end 
 end
 
-if isfield(fixEffectRes,'link') %checks if link is in the file
-    link = fixEffectRes.link; %link is in the file, use it
-else %link is not in the file, use one from another file
-    link = load([dataPath,'\tstats.mat'],'link');
-    link = link.link;
-end
-tstats = fixEffectRes.tstats;
+nirs.SD3D = SD3D;
 
-for nRow = 1:size(resTable,1)
-    source = resTable.source(nRow);
-    detector = resTable.detector(nRow);
-    lambda = resTable.lambda(nRow);
-    indx = find((link.source == source).*(link.detector == detector).*(link.type == lambda));
-    if numel(indx) ~= 1
-        error(['Wrong number of rows in link, expected 1, found ',num2str(numel(indx))]);
-    end
-    resTable.tstat(nRow) = tstats.(participant)(indx);
-end
+save([basePath,'.nirs'],'-struct','nirs'); %overwrites the .nirs file with a version with the real landmarks and src/det positions
+disp([basePath,'.nirs', ' saved with corrected landmarks']);
+SD3Dtmp = SD3D;
+SD3D = [];
+SD3D.SD3D = SD3Dtmp;
+save([basePath,'_default.SD3D'],'-struct','SD3D'); 
+disp([basePath,'_default.SD3D', ' saved with corrected landmarks']);
 
-prepro.tDOD = prepro.tDOD(1);
-prepro.dod = resTable.tstat';
-% prepro
-prepro.fileName = preproOut;
-
-save(preproOut,'-struct','prepro');
-disp([preproOut, ' done']);

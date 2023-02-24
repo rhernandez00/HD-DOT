@@ -5,6 +5,7 @@ function T = getSourcesAndDetectorsPos(fileToRead)
 switch ext
     case '.SD3D'
         SD3D = load(fileToRead,'-mat');
+        SD3D = SD3D.SD3D;
     otherwise
         error(['Extension not found: ',ext,' . write the case']);
 end

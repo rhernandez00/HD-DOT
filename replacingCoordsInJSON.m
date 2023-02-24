@@ -10,7 +10,7 @@ json_dataOriginal = jsondecode(fileread(baseJSONFile));
 json_data = json_dataOriginal;
 
 % tableFile = [driveFolder,'\NIRS\Shared\Kunkun_pos.csv']; %table used to replace the coordinates
-tableFile = [driveFolder,'\Laugh\HD-DOT\photogrammetry\Kunkun_session01_pos.csv']; %table used to replace the coordinates
+tableFile = [driveFolder,'\Laugh\HD-DOT\workingFolder\photogrammetry\Kunkun_session01_pos.csv']; %table used to replace the coordinates
 T = readtable(tableFile);
 for nRow = 1:5
     json_data.landmarks(nRow).x = T.x(nRow)*10;
