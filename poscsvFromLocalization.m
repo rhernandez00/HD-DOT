@@ -2,7 +2,7 @@ clear
 getDriveFolder;
 addpath([driveFolder,'\HD-DOT\HD-DOT\functions']);
 
-participant = 'Kunkun';
+participant = 'Rohan';
 specie = 'D';
 session = 1;
 locationsFolder = ['G:\My Drive\Laugh\HD-DOT\workingFolder\photogrammetry'];

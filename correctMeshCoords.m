@@ -210,9 +210,11 @@ specie = 'D';
 % experiment = 'Laugh';`
 % dataPath = 'D:\Raul\data';
 dataPath = 'G:\My Drive\Laugh\HD-DOT\workingFolder';
-dotimgPath = [dataPath,'\',participant,'_run01_001.dotimg'];
+dotimgPath = [dataPath,'\',participant,'_run01.dotimg'];
 
 dotimg = load(dotimgPath, '-mat');
 
 rmapPath = [dataPath,'\',participant,'.rmap'];
 [~,rmap] = getMesh(rmapPath,true);
+%%
+
