@@ -3,8 +3,8 @@
 
 clear
 getDriveFolder
-baseJSONFile = [driveFolder,'\NIRS\Layouts\layout.json']; %original layout file
-newJSONFile = [driveFolder,'\NIRS\Layouts\Kunkun_session01.json']; %new layout file
+baseJSONFile = [driveFolder,'\NIRS\Layouts\GA00278_v2.json']; %original layout file
+newJSONFile = [driveFolder,'\NIRS\Layouts\Rohan_session02.json']; %new layout file
 
 json_dataOriginal = jsondecode(fileread(baseJSONFile));
 json_data = json_dataOriginal;

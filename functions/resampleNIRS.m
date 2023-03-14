@@ -34,7 +34,7 @@ for nChan = 1:size(nirs.d,2) %resamples every channel and saves it into the new 
     [nirs.d(:,nChan),tOut]=resample(double(nirsIn.d(:,nChan)),nirsIn.t,newFs);
 end
 
-nirs.d = single(nirs.d); %transforms back to single
+% nirs.d = single(nirs.d); %transforms back to single
 nirs.t = tOut; %saves the new time vector
 
 save(nirsFileNameOut,'-struct','nirs','-v7.3'); %saves output file
