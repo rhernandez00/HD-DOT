@@ -3,14 +3,25 @@
 
 clear
 getDriveFolder
-baseJSONFile = [driveFolder,'\NIRS\Layouts\GA00278_v2.json']; %original layout file
-newJSONFile = [driveFolder,'\NIRS\Layouts\Rohan_session02.json']; %new layout file
+addpath([pwd,'\functions'])
+participant = 'Odin';
+experiment = 'Voice_sens2';
+session = 2;
+
+baseJSONFile = [driveFolder,'\HD-DOT\layouts\GA00279_v2.json']; %original layout file
+layoutsPath = [driveFolder,'\',experiment,'\layouts'];
+newJSONFile = [layoutsPath,'\',participant,'_session',sprintf('%02d',session),'.json']; %new layout file
+
+if ~exist(layoutsPath,'dir')
+    mkdir(layoutsPath);
+    disp(['Folder not found, creating: ', layoutsPath]);
+end
 
 json_dataOriginal = jsondecode(fileread(baseJSONFile));
 json_data = json_dataOriginal;
 
-% tableFile = [driveFolder,'\NIRS\Shared\Kunkun_pos.csv']; %table used to replace the coordinates
-tableFile = [driveFolder,'\Laugh\HD-DOT\workingFolder\photogrammetry\Kunkun_session01_pos.csv']; %table used to replace the coordinates
+tableFile = [driveFolder,'\',experiment,'\layouts\',...
+    participant,'_session',sprintf('%02d',session),'_pos.csv']; %table used to replace the coordinates
 T = readtable(tableFile);
 for nRow = 1:5
     json_data.landmarks(nRow).x = T.x(nRow)*10;

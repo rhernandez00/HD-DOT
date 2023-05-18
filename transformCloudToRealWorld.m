@@ -4,8 +4,11 @@
 clc
 clear
 getDriveFolder;
-cloudFolder = [driveFolder,'\Laugh\HD-DOT\photogrammetry'];
-cloudName = 'Odin_session01';
+% cloudFolder = [driveFolder,'\Laugh\HD-DOT\photogrammetry'];
+cloudFolder = ['G:\My Drive\Voice_sens2\photogrammetry'];
+participant = 'Kunkun';
+sessionN = 2;
+cloudName = [participant,'_session',sprintf('%02d',sessionN)];
 
 
 propsFile = [cloudFolder,'/',cloudName,'_distances.mat'];

@@ -2,14 +2,22 @@ clear
 getDriveFolder;
 addpath([driveFolder,'\HD-DOT\HD-DOT\functions']);
 
-participant = 'Rohan';
+participant = 'Odin';
 specie = 'D';
-session = 1;
-locationsFolder = ['G:\My Drive\Laugh\HD-DOT\workingFolder\photogrammetry'];
+session = 2;
+experiment = 'Voice_sens2';
+locationsFolder = [driveFolder,'\',experiment,'\photogrammetry'];
 
 dataFolder = 'G:\My Drive';
-csvName = [locationsFolder,'\',participant,'_session',sprintf('%02d',session),'_pos.csv'];
+
 locationsFile = [locationsFolder,'\',participant,'_session',sprintf('%02d',session),'_realDistance_aligned.mat'];
+layoutsPath = [driveFolder,'\',experiment,'\layouts'];
+if ~exist(layoutsPath, 'dir')
+    disp("layouts folder doesn't exist, creating one: ");
+    disp(layoutsPath);
+    mkdir(layoutsPath);
+end
+csvName = [layoutsPath,'\',participant,'_session',sprintf('%02d',session),'_pos.csv'];
 meshType = [specie,participant];
 [~,mesh] = getMesh(meshType,true);
 
