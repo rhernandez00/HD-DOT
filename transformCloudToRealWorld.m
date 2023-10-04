@@ -1,19 +1,8 @@
-%This script loads  the .mat file with some of the tiles located to
+function transformCloudToRealWorld(cloudFile,propsFile,newCloudFile)
+%This functino loads the .mat file with some of the tiles located to
 %calculate the real world distance in the pointcloud and then transform the
-%distances in it. The file is saved as [cloudName]_realDistance.ply
-clc
-clear
-getDriveFolder;
-% cloudFolder = [driveFolder,'\Laugh\HD-DOT\photogrammetry'];
-cloudFolder = ['G:\My Drive\Voice_sens2\photogrammetry'];
-participant = 'Kunkun';
-sessionN = 2;
-cloudName = [participant,'_session',sprintf('%02d',sessionN)];
-
-
-propsFile = [cloudFolder,'/',cloudName,'_distances.mat'];
-cloudFile = [cloudFolder,'/',cloudName,'.ply'];
-newCloudFile = [cloudFolder,'/',cloudName,'_realDistance.ply'];
+%distances in it. The file is saved as newCloudFile
+addpath([pwd,'\functions']);
 
 appProps = load(propsFile);
 appProps = appProps.appProps;

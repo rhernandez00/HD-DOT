@@ -1,14 +1,23 @@
+function localizationToJSON()
+%Run this after localization
 clear
 getDriveFolder;
 addpath([driveFolder,'\HD-DOT\HD-DOT\functions']);
+addpath([driveFolder,'\GemmaLab\functions'])
 
-participant = 'Odin';
-specie = 'D';
-session = 2;
-experiment = 'Voice_sens2';
-locationsFolder = [driveFolder,'\',experiment,'\photogrammetry'];
 
-dataFolder = 'G:\My Drive';
+baseJSONFile = [driveFolder,'\HD-DOT\layouts\GA00279_v2.json']; %original layout file
+layoutsPath = [driveFolder,'\',experiment,'\layouts'];
+newJSONFile = [layoutsPath,'\',participant,'_session',sprintf('%02d',session),'.json']; %new layout file
+
+if ~exist(layoutsPath,'dir')
+    mkdir(layoutsPath);
+    disp(['Folder not found, creating: ', layoutsPath]);
+end
+
+json_dataOriginal = jsondecode(fileread(baseJSONFile));
+json_data = json_dataOriginal;
+
 
 locationsFile = [locationsFolder,'\',participant,'_session',sprintf('%02d',session),'_realDistance_aligned.mat'];
 layoutsPath = [driveFolder,'\',experiment,'\layouts'];
@@ -97,5 +106,3 @@ Tanatomical = table(ID,x,y,z);%creates table for anatomical markers
 % ----------------------------------------------------------
 T = [Tanatomical;Ttiles]; %appending both tables on final table T
 
-writetable(T,csvName);
-disp(['file finished: ' csvName]);
