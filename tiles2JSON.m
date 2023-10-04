@@ -49,9 +49,10 @@ for nFileType = 1:numel(filesPossible)
     allTiles(nFileType).tiles = tiles;
     
 end
-
+disp('Merging files...');
 tilesOut = mergeTiles(allTiles,tilesUsedForMatch);
 %%
+disp('Saving to JSON');
 optodeList = {'optode_a','optode_b','optode_c'}; %optodes to save 
 markerList = {'Nz','Iz','Ar','Al','Cz'};%name of markers, tileNumbers: 13-17
 anatomicalMarkers = 13:17; %tileNumber of anatomical markers
