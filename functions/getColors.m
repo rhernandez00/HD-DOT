@@ -1,6 +1,6 @@
 function colors = getColors(colorScheme)
 if nargin < 1
-    colorScheme = 1;
+    colorScheme = 28;
 end
 
 switch colorScheme
