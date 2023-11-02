@@ -120,22 +120,10 @@ if runConvertLUMO
     end
     
     movefile(SD3DFileName,[baseName,'_default.SD3D']);
-    
-
-    %[nirs, nirsFileName2] = DOTHUB_LUMO2nirs(lumoDir);%converts .LUMO to nirs file
-    
-    %posCSVFileName = [dataFolder,'\',experiment,'\raw\',participant,'_pos.csv'];
-    %layoutFileName = [dataFolder,'\',experiment,'\raw\',participant,'_layout.json']; %use replacingCoordsInJSON.m to create
-    %IS NOT LOADING THE LAYOUT FILE FROM THE FOLDER
-    
-  
-    %movefile([dataFolder,'\',experiment,'\raw\',participant,'_pos.SD3D'],[baseName,'_default.SD3D']);
 end
 %% cutting and resampling nirs file using recorded s and e (or endTime)
 if runCutNIRS
     cutNIRS(nirsFileName,endTime); %cuts the nirs file using the events 's' (start) and 'e' (end) and saves it
-    % resampling nirs file
-    
 end
 
 if runResample
@@ -149,10 +137,7 @@ end
 
 preproFileName = [baseName,'.prepro'];
 if runPreprocess
-    
     nirs = load(nirsFileName,'-mat');
-    
-
     dod = double(hmrIntensity2OD(nirs.d)); %Converts raw data to optical density. 
     SD3D = enPruneChannels(nirs.d,nirs.SD3D,ones(size(nirs.t)),[0 1e11],12,[0 100],0); %prunes noisy channels
     %Force MeasListAct to be the same across wavelengths
@@ -164,15 +149,13 @@ if runPreprocess
     SD2D.MeasListAct = SD3D.MeasListAct;
     dod = hmrBandpassFilt(dod,nirs.t',0,0.5); %Bandpass filter
     dc = hmrOD2Conc(dod,SD3D,[6 6]); %convert optical density to
-    %hemoglobin concentration %I skipped this step because we will run GLM,
-
+    %hemoglobin concentration
     %Creating prepro file
     DOTHUB_writePREPRO(preproFileName,[],dc,nirs.t,SD3D);
 end
 
 %% Registering chosen mesh to subject SD3D and creating rmap
 
-% rmapFileName = [baseName,'.rmap'];
 if runMeshRegistration
     DOTHUB_meshRegistration(nirsFileName,origMeshFileName);
 end
@@ -210,7 +193,6 @@ end
 rmapFileName = [baseName,'.rmap'];
 
 if runReconstruction
-    
     rmap = load(rmapFileName,'-mat'); %loads rmap
     GMNum = find(strcmp(rmap.headVolumeMesh.labels,'GM')); %#ok<EFIND> %finds the GM number
     if isempty(GMNum)
@@ -320,7 +302,3 @@ if run4D
         generate4D(experiment,participant,runN,imgType,'dataFolder',dataFolder,'volumes',volumes);
     end
 end
-
-%     if isempty(volumes)
-%             volumes = dataTable.volumeI(nFile):dataTable.volumeF(nFile);
-%         end
