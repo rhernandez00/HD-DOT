@@ -52,8 +52,6 @@ for nStep = 1:numel(stepsToRun) %check which steps are required
         case 9
             runMesh2nii = true;
         case 10
-            runrmap2Nii = true;
-        case 11
             run4D = true;
         otherwise
             error('The only steps possible are 1:7')
