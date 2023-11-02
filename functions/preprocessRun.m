@@ -26,8 +26,7 @@ runInvertJacobian = false; %6. run invert Jacobian?
 runSlice = false; %7. slices the prepro file so the reconstruction fits in the RAM
 runReconstruction = false; %8. run reconstruction?
 runMesh2nii = false; %9. run mesh2nii
-runrmap2Nii = false; %10. run rmap2nii
-run4D = false; %11. create 4D file from independent-volume nifti?
+run4D = false; %10. create 4D file from independent-volume nifti?
 
 for nStep = 1:numel(stepsToRun) %check which steps are required
     step = stepsToRun(nStep);
@@ -168,11 +167,8 @@ if runPreprocess
     dod = hmrBandpassFilt(dod,nirs.t',0,0.5); %Bandpass filter
     dc = hmrOD2Conc(dod,SD3D,[6 6]); %convert optical density to
     %hemoglobin concentration %I skipped this step because we will run GLM,
-    %the z-transformation, baseline and contrasts should negate any conversion
-    dc = dc*1e6; %Homer works in Molar by default, we use uMolar.
 
     %Creating prepro file
-    %DOTHUB_writePREPRO(preproFileName,[],dod,nirs.t,SD3D);
     DOTHUB_writePREPRO(preproFileName,[],dc,nirs.t,SD3D);
 end
 
@@ -180,9 +176,7 @@ end
 
 % rmapFileName = [baseName,'.rmap'];
 if runMeshRegistration
-    [~,rmapFileName2] = DOTHUB_meshRegistration(nirsFileName,origMeshFileName);
-%     movefile(rmapFileName2,rmapFileName);
-%     disp(['rmap moved to: ',rmapFileName]);
+    DOTHUB_meshRegistration(nirsFileName,origMeshFileName);
 end
 
 %% Calculate Jacobian. 
@@ -200,10 +194,7 @@ if runJacobian
     else %if the file doesn't exist, it calculates the Jacobian
         disp([jacFileName, ' doesnt exist, creating one...']);
         basis = [30 30 30];
-        [jac, jacFileName2] = DOTHUB_makeToastJacobian(rmapFileName,basis);
-        disp(['Changing ', jacFileName2, ' to ',jacFileName]);
-%        movefile(jacFileName2,jacFileName);
-        clear jac
+        DOTHUB_makeToastJacobian(rmapFileName,basis);
     end
 end
 %% 7. Invert Jacobian
@@ -211,16 +202,11 @@ end
 invjacFileName = [baseName,'.invjac'];
 if runInvertJacobian
     DOTHUB_invertJacobian(jacFileName,preproFileName,'saveFlag',true,'reconMethod','multispectral','hyperParameter',0.01);
-%     movefile(invjacFileName2,invjacFileName);
-    disp(['invjac moved to: ',invjacFileName]);
 end
 %% 7. Slicing prepro so RAM can make the conversion
 if runSlice
     fileName = [participant,'_run',sprintf('%02d',runN)];
     slicePrepro(preproFolder,fileName,true);
-    
-    
-    
 end
 %% 8. Reconstruction
 rmapFileName = [baseName,'.rmap'];
@@ -276,19 +262,9 @@ if runReconstruction
             end
         end
         
-        %movefile(dotimgFileName2,dotimgFileName);
-        
     end
 end
 
-
-
-% dotimgFileName = [baseName,'.dotimg'];
-% if runReconstruction
-%     [~, dotimgFileName2] = DOTHUB_reconstruction(preproFileName,[],invjacFileName,rmapFileName,'saveVolumeImages',true);
-%     movefile(dotimgFileName2,dotimgFileName);
-%     disp(['dotimg moved to: ',dotimgFileName]);
-% end
 %% 9. Mesh to nii
 
 if runMesh2nii
@@ -337,24 +313,10 @@ if runMesh2nii
     end
 end
 
-%% 10. Segmented anatomical from rmap
-if runrmap2Nii
-    voxSize = 1;
-    rmap = load(rmapFileName,'-mat'); %loads rmap
-    s = getNiiDims(rmap,voxSize); 
-    segmentedNiiPath = [baseName,'_rmap.nii'];
-    imageM = rmap.headVolumeMesh.node(:,4);
 
-    crange = [min(rmap.headVolumeMesh.node(:,4)),max(rmap.headVolumeMesh.node(:,4))];
-    mesh2nifti(segmentedNiiPath,rmap,imageM,voxSize,crange,s,specie,[],[]);
-    nii = load_untouch_niiR([baseName,'_rmap.nii.gz']);
-    nii.img = remapValues(nii.img);
-    save_untouch_nii(nii,[baseName,'_rmap.nii.gz']);
-end
-%% 11. single volume nifti to 4D
+%% 10. single volume nifti to 4D
 if run4D
     imgTypes = {'hbo','hbr'};
-    imgTypes = {'hbo'};
     for nType = 1:numel(imgTypes)
         imgType = imgTypes{nType};
         generate4D(experiment,participant,runN,imgType,'dataFolder',dataFolder,'volumes',volumes);

@@ -19,11 +19,10 @@ for nRow = 1:size(T,1)
     end
 end
 
-rmapNiiPath = [preproFolder,'\',participant,'_run',sprintf('%02d',runN),'_rmap.nii.gz'];
 output4D = [preproFolder,'\',participant,'_run',sprintf('%02d',runN),'_',imgType,'.nii.gz'];
 
 % Load the nifti file
-rmapNii = load_nii(rmapNiiPath);
+mapNii = load_nii(fileList{i});
 
 
 if ~isempty(volumes)
@@ -33,7 +32,7 @@ end
 
 % Initialize the 4D matrix to hold the loaded and cropped nifti files
 numFiles = length(fileList);
-nifti4D = zeros(size(rmapNii.img,1),size(rmapNii.img,2),size(rmapNii.img,3),numFiles);
+nifti4D = zeros(size(mapNii.img,1),size(mapNii.img,2),size(mapNii.img,3),numFiles);
 
 
 % Loop through the fileList and load, crop, and save each nifti file
@@ -46,8 +45,7 @@ for i = 1:numFiles
     maxValue = max(nii.img(:));    
     nii.img = (nii.img - minValue) * ((maxList(i) - minList(i)) / (maxValue - minValue)) + minList(i);
     
-    % Save the cropped nifti file to the 4D matrix, add the cropped rmap as
-    % background
+    % Save nifti file to the 4D matrix
     nifti4D(:,:,:,i) = nii.img;
 end
 
