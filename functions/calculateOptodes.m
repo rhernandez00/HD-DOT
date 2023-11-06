@@ -4,7 +4,7 @@ optode_a = inputTile.optode_a;
 optode_b = inputTile.optode_b;
 optode_c = inputTile.optode_c;
 distance = 8.8800;
-distance = 0;
+% distance = 0;
 % distance = 88.800;
 
 % Find the midpoint of optode_b and optode_c
