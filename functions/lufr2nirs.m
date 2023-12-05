@@ -11,6 +11,7 @@ lumofile.write_NIRS(nirsFileName,enum,data,events);
 %positions csv file
 nirs = load(nirsFileName,'-mat');
 layoutData = jsondecode(fileread(layoutFileName));
+% [SD_POL, SD3DFileName] = DOTHUB_LUMOpolhemus2SD3D_v2(posCSVFileName,0); %This line saves the .SD3D
 [SD_POL, SD3DFileName] = DOTHUB_LUMOpolhemus2SD3D(posCSVFileName,0); %This line saves the .SD3D
 nodes = enum.groups.nodes;
 nNodes = length(nodes);
