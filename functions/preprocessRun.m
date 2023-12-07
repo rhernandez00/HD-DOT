@@ -1,9 +1,8 @@
-function preprocessRun(experiment,participant,runN,stepsToRun,specie,sessionNumber,varargin)
+function preprocessRun(experiment,participant,runN,stepsToRun,specie,sessionNumber,meshFolder)
 % stepsToRun - vector of steps to run (vector with number from 1 to 7)
 
-getDriveFolder
 dataFolder = getArgumentValue('dataFolder','D:\Raul\data',varargin{:});
-toolboxFolder = getArgumentValue('toolboxFolder',[driveFolder,'\NIRS\DOT-HUB_toolbox-master'],varargin{:});
+toolboxFolder = getArgumentValue('toolboxFolder',['G:\My Drive','\NIRS\DOT-HUB_toolbox-master'],varargin{:});
 endTime = getArgumentValue('endTime',[],varargin{:}); %moment where the acquisition ends after the s
 lumoDir = [dataFolder,'\',experiment,'\raw\',participant,'_run',sprintf('%02d',runN),'.LUMO'];
 meshType = getArgumentValue('meshType','HAdult',varargin{:}); %also takes DKunkun
@@ -13,7 +12,10 @@ layoutPath = getArgumentValue('layoutPath',[dataFolder,'\',experiment,'\layouts\
 runFull4D = getArgumentValue('runFull4D',true,varargin{:}); %true - saves every voxel in the 4D (slower), false - skips non-brain tissue (faster, requires 10- rmap2nii)
 volumes = getArgumentValue('volumes',[],varargin{:}); %Overwrite volumes to process for step 11
 posFile = getArgumentValue('posFile','both',varargin{:});
-sensitiveToGM = getArgumentValue('sensitiveToGM',true,varargin{:}); %focus sensitivity to voxels within GM
+
+if isempty(meshFolder)
+    error('You should provide the path to the meshFolder, it is the argument after sessionNumber');
+end
 
 %initilize preprocessing steps to run
 runConvertLUMO = false; %1. run LUMO2nirs?
@@ -66,13 +68,9 @@ end
 baseName = [preproFolder,'\',participant,'_run',sprintf('%02d',runN)];
 nirsFileName = [baseName,'.nirs'];
 
-origMeshFileName = getMesh(meshType); %gets filename of mesh according to the meshType requested
-
+origMeshFileName = getMesh(meshType,meshFolder); %gets filename of mesh according to the meshType requested
 
 addpath(genpath(toolboxFolder)); %adds all the subfolders of the toolbox
-functionsPath = [driveFolder,'\GemmaLab\functions']; %path to the functions I sent you
-addpath(functionsPath);
-
 
 if runConvertLUMO
     %These correct the spacing in the output files from lumo.
@@ -222,18 +220,12 @@ if runReconstruction
                 disp(['File: ', dotimgFileName, ' doesnt exist creating temporal file']);
                 dotimg = DOTHUB_reconstruction(preproFileName,[],invjacFileName,rmapFileName,'saveVolumeImages',true);
                 disp(['dotimg saved to: ',dotimgFileName]);
-                if sensitiveToGM %select minimum and maximum based on GM
-                    minVal1 = min(dotimg.hbo.vol(:,GMIndx));
-                    minVal2 = min(dotimg.hbo.vol(:,GMIndx));
-                    maxVal1 = max(dotimg.hbr.vol(:,GMIndx));
-                    maxVal2 = max(dotimg.hbr.vol(:,GMIndx));
-                else
-                    minVal1 = min(dotimg.hbo.vol(:,:));
-                    minVal2 = min(dotimg.hbo.vol(:,:));
-                    maxVal1 = max(dotimg.hbr.vol(:,:));
-                    maxVal2 = max(dotimg.hbr.vol(:,:));
-                end
-
+                
+                minVal1 = min(dotimg.hbo.vol(:,:));
+                minVal2 = min(dotimg.hbo.vol(:,:));
+                maxVal1 = max(dotimg.hbr.vol(:,:));
+                maxVal2 = max(dotimg.hbr.vol(:,:));
+            
                 minVal = min([minVal1,minVal2]);
                 maxVal = max([maxVal1,maxVal2]);
                 dataTable.minVal(nFile) = minVal;
@@ -281,12 +273,12 @@ if runMesh2nii
         minVal = dataTable.minVal(nFile); %gets the minimum and maximum to create the plot
         maxVal = dataTable.maxVal(nFile);
         if runFull4D
-            mesh4D2nifti(inputFile,outputFolder,specie,volumesToUse,rmapFileName,minVal,maxVal,[],[]);
+            mesh4D2nifti(inputFile,outputFolder,specie,volumesToUse,rmapFileName,minVal,maxVal,[],[],meshFolder);
         else
             
             rmapNiiPath = [preproFolder,'\',participant,'_run',sprintf('%02d',runN),'_rmap.nii.gz'];
             [initialZ,finalZ] = determineRange(rmapNiiPath);
-            mesh4D2nifti(inputFile,outputFolder,specie,volumesToUse,rmapFileName,minVal,maxVal,initialZ,finalZ);
+            mesh4D2nifti(inputFile,outputFolder,specie,volumesToUse,rmapFileName,minVal,maxVal,initialZ,finalZ,meshFolder);
         end
         
         

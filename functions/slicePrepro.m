@@ -8,15 +8,6 @@ function [preproFileList,dotImgFileList] = slicePrepro(folder,fileName,saveFiles
 %if saveFiles is false the function only outputs the file lists
 
 %Adding the toolbox and other functions
-%getDriveFolder
-%toolboxFolder = [driveFolder,'\NIRS\DOT-HUB_toolbox-master'];
-%addpath(genpath(toolboxFolder)); %adds all the subfolders of the toolbox
-%functionsPath = [driveFolder,'\GemmaLab\functions']; %path to the functions I sent you
-%addpath(functionsPath);
-
-%folder = 'G:\My Drive\Complex\tmp';
-%fileName = 'Kunkun_run01';
-
 prepro = load([folder,'\', fileName,'.prepro'], '-mat');
 if nargin < 4
     maxTimePoints = 20;

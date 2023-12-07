@@ -1,9 +1,9 @@
-function mesh4D2nifti(inputFile,folder,specie,volumes,rmapFileName,minVal,maxVal,initialZ,finalZ)
+function mesh4D2nifti(inputFile,folder,specie,volumes,rmapFileName,minVal,maxVal,initialZ,finalZ,meshFolder)
 %Loads a dotimg 4D file and transforms it to nifti
 
 voxSize = 1;
 % rmap = load(origMeshFileName,'-mat'); %loads the atlas mesh
-[~,rmap] = getMesh(rmapFileName,true);
+[~,rmap] = getMesh(rmapFileName,meshFolder,true);
 disp(['Loading: ', folder,'\',inputFile,'.dotimg ...']);
 dotimg = load([folder,'\',inputFile,'.dotimg'], '-mat');
 dotimg.hbo = rmfield(dotimg.hbo,'gm');
