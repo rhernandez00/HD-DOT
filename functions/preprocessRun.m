@@ -1,4 +1,4 @@
-function preprocessRun(experiment,participant,runN,stepsToRun,specie,sessionNumber,meshFolder)
+function preprocessRun(experiment,participant,runN,stepsToRun,specie,sessionNumber,meshFolder,varargin)
 % stepsToRun - vector of steps to run (vector with number from 1 to 7)
 
 dataFolder = getArgumentValue('dataFolder','D:\Raul\data',varargin{:});
