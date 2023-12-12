@@ -173,10 +173,10 @@ if runJacobian
     else %if the file doesn't exist, it calculates the Jacobian
         disp([jacFileName, ' doesnt exist, creating one...']);
         basis = [30 30 30];
-        tic
         DOTHUB_makeToastJacobian(rmapFileName,basis);
+        tic
         disp('Jacobian is done! It only costed you: ');
-        disp([num2str(toc), ' seconds']);
+        disp(toc)
     end
 end
 %% 7. Invert Jacobian
