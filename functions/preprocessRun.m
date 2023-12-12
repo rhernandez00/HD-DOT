@@ -269,7 +269,7 @@ if runMesh2nii
         end
         volumesInFile = dataTable.volumeI(nFile):dataTable.volumeF(nFile);
         if isempty(volumes)
-            volumesToUSe = volumesInFile;
+            volumesToUse = volumesInFile;
         else
             volumesToUse = volumesInFile.*ismember(volumesInFile,volumes);
         end
